@@ -14,13 +14,13 @@ import dummy from "./dummy-data";
 import "./App.css";
 
 const App = () => {
-  // Create a state called `posts` to hold the array of post objects, **initializing to dummyData**.
-  // This state is the source of truth for the data inside the app. You won't be needing dummyData anymore.
-  // To make the search bar work (which is stretch) we'd need another state to hold the search term.
-  const [posts, setPosts] = useState(dummy);
+	// Create a state called `posts` to hold the array of post objects, **initializing to dummyData**.
+	// This state is the source of truth for the data inside the app. You won't be needing dummyData anymore.
+	// To make the search bar work (which is stretch) we'd need another state to hold the search term.
+	const [posts, setPosts] = useState(dummy);
 
-  const likePost = (postId) => {
-    /*
+	const likePost = (postId, isLikedState) => {
+		/*
       This function serves the purpose of increasing the number of likes by one, of the post with a given id.
 
       The state of the app lives at the top of the React tree, but it wouldn't be fair for nested components not to be able to change state!
@@ -32,24 +32,37 @@ const App = () => {
         - otherwise just return the post object unchanged.
      */
 
-    setPosts(
-      posts.map((post) => {
-        if (post.id === postId) {
-          return {...post, likes: post.likes + 1}
-        }
-        return post
-      })
-    );
-  };
+		const { liked, isLiked } = isLikedState;
 
-  return (
-    <div className="App">
-      {/* Add SearchBar and Posts here to render them */}
-      <SearchBar />
-      <Posts posts={posts} likePost={likePost} />
-      {/* Check the implementation of each component, to see what props they require, if any! */}
-    </div>
-  );
+		const likedConditioning = (likedBool) => {
+			setPosts(
+				posts.map((post) => {
+					const changedValue =
+						likedBool !== true ? post.likes + 1 : post.likes - 1;
+					if (post.id === postId) {
+						return { ...post, likes: changedValue };
+					}
+					return post;
+				})
+			);
+		};
+
+		if (liked === false) {
+			likedConditioning(liked);
+		} else if (liked === true) {
+			likedConditioning(liked);
+		}
+		isLiked(!liked);
+	};
+
+	return (
+		<div className="App">
+			{/* Add SearchBar and Posts here to render them */}
+			<SearchBar />
+			<Posts posts={posts} likePost={likePost} />
+			{/* Check the implementation of each component, to see what props they require, if any! */}
+		</div>
+	);
 };
 
 export default App;
